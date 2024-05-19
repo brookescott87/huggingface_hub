@@ -184,7 +184,7 @@ def http_backoff(
     method: HTTP_METHOD_T,
     url: str,
     *,
-    max_retries: int = 5,
+    max_retries: int = 0,
     base_wait_time: float = 1,
     max_wait_time: float = 8,
     retry_on_exceptions: Union[Type[Exception], Tuple[Type[Exception], ...]] = (
@@ -209,8 +209,8 @@ def http_backoff(
             HTTP method to perform.
         url (`str`):
             The URL of the resource to fetch.
-        max_retries (`int`, *optional*, defaults to `5`):
-            Maximum number of retries, defaults to 5 (no retries).
+        max_retries (`int`, *optional*, defaults to `0`):
+            Maximum number of retries, defaults to 0 (no retries).
         base_wait_time (`float`, *optional*, defaults to `1`):
             Duration (in seconds) to wait before retrying the first time.
             Wait time between retries then grows exponentially, capped by
@@ -282,7 +282,7 @@ def http_backoff(
                 return response
 
             # Wrong status code returned (HTTP 503 for instance)
-            logger.warning(f"HTTP Error {response.status_code} thrown while requesting {method} {url}")
+            logger.warning(f"\nHTTP Error {response.status_code} thrown while requesting {method} {url}")
             if nb_tries > max_retries:
                 response.raise_for_status()  # Will raise uncaught exception
                 # We return response to avoid infinite loop in the corner case where the
@@ -290,10 +290,12 @@ def http_backoff(
                 return response
 
         except retry_on_exceptions as err:
-            logger.warning(f"'{err}' thrown while requesting {method} {url}")
+            logger.warning(f"\n'{err}' thrown while requesting {method} {url}")
 
             if isinstance(err, requests.ConnectionError):
+                logger.warning('Resetting sessions due to Connection Error')
                 reset_sessions()  # In case of SSLError it's best to reset the shared requests.Session objects
+                raise err
 
             if nb_tries > max_retries:
                 raise err
