@@ -186,7 +186,7 @@ def http_backoff(
     method: HTTP_METHOD_T,
     url: str,
     *,
-    max_retries: int = 5,
+    max_retries: int = 0,
     base_wait_time: float = 1,
     max_wait_time: float = 8,
     retry_on_exceptions: Union[Type[Exception], Tuple[Type[Exception], ...]] = (
@@ -211,8 +211,8 @@ def http_backoff(
             HTTP method to perform.
         url (`str`):
             The URL of the resource to fetch.
-        max_retries (`int`, *optional*, defaults to `5`):
-            Maximum number of retries, defaults to 5 (no retries).
+        max_retries (`int`, *optional*, defaults to `0`):
+            Maximum number of retries, defaults to 0 (no retries).
         base_wait_time (`float`, *optional*, defaults to `1`):
             Duration (in seconds) to wait before retrying the first time.
             Wait time between retries then grows exponentially, capped by
