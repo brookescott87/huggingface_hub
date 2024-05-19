@@ -284,7 +284,7 @@ def http_backoff(
                 return response
 
             # Wrong status code returned (HTTP 503 for instance)
-            logger.warning(f"HTTP Error {response.status_code} thrown while requesting {method} {url}")
+            logger.warning(f"\nHTTP Error {response.status_code} thrown while requesting {method} {url}")
             if nb_tries > max_retries:
                 response.raise_for_status()  # Will raise uncaught exception
                 # We return response to avoid infinite loop in the corner case where the
@@ -292,7 +292,7 @@ def http_backoff(
                 return response
 
         except retry_on_exceptions as err:
-            logger.warning(f"'{err}' thrown while requesting {method} {url}")
+            logger.warning(f"\n'{err}' thrown while requesting {method} {url}")
 
             if isinstance(err, requests.ConnectionError):
                 reset_sessions()  # In case of SSLError it's best to reset the shared requests.Session objects
