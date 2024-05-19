@@ -295,6 +295,7 @@ def http_backoff(
             logger.warning(f"\n'{err}' thrown while requesting {method} {url}")
 
             if isinstance(err, requests.ConnectionError):
+                logger.warning('Resetting sessions due to Connection Error')
                 reset_sessions()  # In case of SSLError it's best to reset the shared requests.Session objects
 
             if nb_tries > max_retries:
